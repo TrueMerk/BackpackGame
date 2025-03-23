@@ -5,6 +5,7 @@ using System;
 public class SlotHoverRemover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private bool isHovered = false;
+    
     public Action onRelease;  
     private void Update()
     {

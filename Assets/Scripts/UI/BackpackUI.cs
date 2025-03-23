@@ -4,16 +4,17 @@ using System.Collections.Generic;
 
 public class BackpackUI : MonoBehaviour
 {
-    private Dictionary<int, GameObject> slotMap = new Dictionary<int, GameObject>();
-    [SerializeField] private GameObject slotPrefab; 
-    [SerializeField] private Transform weaponsContainer;
-    [SerializeField] private Transform toolsContainer;
-    [SerializeField] private Transform consumablesContainer;
-    [SerializeField] private CanvasGroup canvasGroup; 
+    private Dictionary<int, GameObject> _slotMap = new Dictionary<int, GameObject>();
+    
+    [SerializeField] private GameObject _slotPrefab; 
+    [SerializeField] private Transform _weaponsContainer;
+    [SerializeField] private Transform _toolsContainer;
+    [SerializeField] private Transform _consumablesContainer;
+    [SerializeField] private CanvasGroup _canvasGroup; 
 
     private void Start()
     {
-        Backpack.Instance.onInventoryChange.AddListener(UpdateUI);
+        Backpack.Instance.OnInventoryChange.AddListener(UpdateUI);
         HideUI(); 
     }
 
@@ -22,11 +23,11 @@ public class BackpackUI : MonoBehaviour
         switch(item.ItemType)
         {
             case ItemType.Weapon:
-                return weaponsContainer;
+                return _weaponsContainer;
             case ItemType.Tool:
-                return toolsContainer;
+                return _toolsContainer;
             case ItemType.Consumable:
-                return consumablesContainer;
+                return _consumablesContainer;
             default:
                 return null;
         }
@@ -36,9 +37,9 @@ public class BackpackUI : MonoBehaviour
     {
         if (action == "added")
         {
-            if (!slotMap.ContainsKey(item.ItemID))
+            if (!_slotMap.ContainsKey(item.ItemID))
             {
-                GameObject prefabToUse = item.UiSlotPrefab != null ? item.UiSlotPrefab : slotPrefab;
+                GameObject prefabToUse = item.UiSlotPrefab != null ? item.UiSlotPrefab : _slotPrefab;
                 Transform parentContainer = GetContainerForItem(item);
                 if (parentContainer == null)
                 {
@@ -61,15 +62,15 @@ public class BackpackUI : MonoBehaviour
                     RemoveItemFromBackpack(capturedID);
                 };
 
-                slotMap.Add(item.ItemID, slot);
+                _slotMap.Add(item.ItemID, slot);
             }
         }
         else if (action == "removed")
         {
-            if (slotMap.TryGetValue(item.ItemID, out GameObject slot))
+            if (_slotMap.TryGetValue(item.ItemID, out GameObject slot))
             {
                 Destroy(slot);
-                slotMap.Remove(item.ItemID);
+                _slotMap.Remove(item.ItemID);
             }
         }
     }
@@ -81,15 +82,15 @@ public class BackpackUI : MonoBehaviour
 
     public void ShowUI()
     {
-        canvasGroup.alpha = 1;
-        canvasGroup.interactable = true;
-        canvasGroup.blocksRaycasts = true;
+        _canvasGroup.alpha = 1;
+        _canvasGroup.interactable = true;
+        _canvasGroup.blocksRaycasts = true;
     }
 
     public void HideUI()
     {
-        canvasGroup.alpha = 0;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
+        _canvasGroup.alpha = 0;
+        _canvasGroup.interactable = false;
+        _canvasGroup.blocksRaycasts = false;
     }
 }

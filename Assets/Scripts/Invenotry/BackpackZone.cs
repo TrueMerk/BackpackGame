@@ -9,6 +9,7 @@ public class BackpackZone : MonoBehaviour
             draggable.SetInBackpack(true);
         }
     }
+    
     private void OnTriggerExit(Collider other)
     {
         if (other.TryGetComponent(out DraggableItem draggable))

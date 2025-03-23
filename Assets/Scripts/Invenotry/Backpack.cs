@@ -5,16 +5,17 @@ using UnityEngine.Events;
 
 public class Backpack : MonoBehaviour
 {
-    private IInventoryNetworkService networkService;
-    private Dictionary<int, GameObject> storedItems = new Dictionary<int, GameObject>();
-    [SerializeField] private List<InventoryItem> items = new List<InventoryItem>();  
-    [SerializeField] private Transform[] attachPoints;
-    [SerializeField] private BackpackUI backpackUI; 
-    [SerializeField] private Transform extractionPoint;  // Точка, куда извлекаются предметы
-    [SerializeField] private InventoryAnimator animator;  // Компонент для анимации переходов
+    private IInventoryNetworkService _networkService;
+    private Dictionary<int, GameObject> _storedItems = new Dictionary<int, GameObject>();
 
-    public UnityEvent<InventoryItem, string> onInventoryChange;
-    public IReadOnlyList<InventoryItem> Items => items.AsReadOnly();
+    [SerializeField] private List<InventoryItem> _items = new List<InventoryItem>();  
+    [SerializeField] private Transform[] _attachPoints;
+    [SerializeField] private BackpackUI _backpackUI; 
+    [SerializeField] private Transform _extractionPoint;  // Точка, куда извлекаются предметы
+    [SerializeField] private InventoryAnimator _animator;  // Компонент для анимации переходов
+    
+    public UnityEvent<InventoryItem, string> OnInventoryChange;
+    public IReadOnlyList<InventoryItem> Items => _items.AsReadOnly();
     public static Backpack Instance { get; private set; }
 
     private void Awake()
@@ -25,7 +26,7 @@ public class Backpack : MonoBehaviour
             Destroy(gameObject);
 
 
-        networkService = new UnityInventoryNetworkService();
+        _networkService = new UnityInventoryNetworkService();
     }
 
     /// <summary>
@@ -52,24 +53,24 @@ public class Backpack : MonoBehaviour
     /// </summary>
     public void AddItem(InventoryItem item, DraggableItem draggable)
     {
-        if (attachPoints == null || attachPoints.Length <= (int)item.ItemType || attachPoints[(int)item.ItemType] == null)
+        if (_attachPoints == null || _attachPoints.Length <= (int)item.ItemType || _attachPoints[(int)item.ItemType] == null)
         {
             Debug.LogError($"Attach point для {item.ItemType} не найден! Проверь массив attachPoints.");
             return;
         }
         
-        if (!items.Contains(item))
-            items.Add(item);
+        if (!_items.Contains(item))
+            _items.Add(item);
         
-        Transform targetPoint = attachPoints[(int)item.ItemType];
+        Transform targetPoint = _attachPoints[(int)item.ItemType];
         draggable.transform.SetParent(targetPoint);
         draggable.gameObject.name = "Item_" + item.ItemID;
-        storedItems[item.ItemID] = draggable.gameObject;
+        _storedItems[item.ItemID] = draggable.gameObject;
         
-        StartCoroutine(animator.AnimateSnapToPosition(draggable.transform, Vector3.zero, Quaternion.identity, 0.5f));
+        StartCoroutine(_animator.AnimateSnapToPosition(draggable.transform, Vector3.zero, Quaternion.identity, 0.5f));
         
-        onInventoryChange?.Invoke(item, "added");
-        StartCoroutine(networkService.SendInventoryEvent(item, "added"));
+        OnInventoryChange?.Invoke(item, "added");
+        StartCoroutine(_networkService.SendInventoryEvent(item, "added"));
     }
 
     /// <summary>
@@ -79,19 +80,19 @@ public class Backpack : MonoBehaviour
     /// </summary>
     public void RemoveItem(int itemID)
     {
-        InventoryItem target = items.Find(x => x.ItemID == itemID);
+        InventoryItem target = _items.Find(x => x.ItemID == itemID);
         if (target != null)
         {
-            items.Remove(target);
-            if (storedItems.TryGetValue(itemID, out GameObject obj))
+            _items.Remove(target);
+            if (_storedItems.TryGetValue(itemID, out GameObject obj))
             {
-                storedItems.Remove(itemID);
+                _storedItems.Remove(itemID);
                 obj.transform.SetParent(null);
-                StartCoroutine(animator.AnimateUnsnap(obj.transform, extractionPoint.position, Quaternion.identity, 0.5f));
+                StartCoroutine(_animator.AnimateUnsnap(obj.transform, _extractionPoint.position, Quaternion.identity, 0.5f));
             }
             
-            onInventoryChange?.Invoke(target, "removed");
-            StartCoroutine(networkService.SendInventoryEvent(target, "removed"));
+            OnInventoryChange?.Invoke(target, "removed");
+            StartCoroutine(_networkService.SendInventoryEvent(target, "removed"));
             DraggableItem draggable = obj.GetComponent<DraggableItem>();
             if(draggable != null)
             {
