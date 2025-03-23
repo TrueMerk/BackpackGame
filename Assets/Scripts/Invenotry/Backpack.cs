@@ -6,10 +6,8 @@ using UnityEngine.Events;
 public class Backpack : MonoBehaviour
 {
     private IInventoryNetworkService networkService;
-
     private Dictionary<int, GameObject> storedItems = new Dictionary<int, GameObject>();
     [SerializeField] private List<InventoryItem> items = new List<InventoryItem>();  
-    
     [SerializeField] private Transform[] attachPoints;
     [SerializeField] private BackpackUI backpackUI; 
     [SerializeField] private Transform extractionPoint;  // Точка, куда извлекаются предметы
@@ -17,7 +15,6 @@ public class Backpack : MonoBehaviour
 
     public UnityEvent<InventoryItem, string> onInventoryChange;
     public IReadOnlyList<InventoryItem> Items => items.AsReadOnly();
-
     public static Backpack Instance { get; private set; }
 
     private void Awake()
@@ -32,8 +29,7 @@ public class Backpack : MonoBehaviour
     }
 
     /// <summary>
-    /// Пример обработки триггера – если предмет входит в зону рюкзака, добавляем его.
-    /// Перед добавлением проверяем, можно ли его добавить 
+    /// Перед добавлением проверяем, можно ли добавить предмет
     /// </summary>
     private void OnTriggerEnter(Collider other)
     {
@@ -107,6 +103,4 @@ public class Backpack : MonoBehaviour
             Debug.LogWarning("Предмет с ID " + itemID + " не найден в рюкзаке!");
         }
     }
-
-    
 }

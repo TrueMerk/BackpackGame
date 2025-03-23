@@ -6,11 +6,9 @@ public class BackpackUI : MonoBehaviour
 {
     private Dictionary<int, GameObject> slotMap = new Dictionary<int, GameObject>();
     [SerializeField] private GameObject slotPrefab; 
-    
     [SerializeField] private Transform weaponsContainer;
     [SerializeField] private Transform toolsContainer;
     [SerializeField] private Transform consumablesContainer;
-
     [SerializeField] private CanvasGroup canvasGroup; 
 
     private void Start()
